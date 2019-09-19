@@ -1,6 +1,8 @@
 package main
 
 import (
+	"time"
+
 	worker "github.com/ValiMail/faktory_worker_go"
 	faktory "github.com/contribsys/faktory/client"
 )
@@ -9,7 +11,7 @@ func someFunc(ctx worker.Context, args ...interface{}) error {
 	// log.Printf("Working on job %s\n", ctx.Jid())
 	// log.Printf("Context %v\n", ctx)
 	// log.Printf("Args %v\n", args)
-	// time.Sleep(1 * time.Millisecond)
+	time.Sleep(100 * time.Millisecond)
 	return nil
 }
 

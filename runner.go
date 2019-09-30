@@ -35,6 +35,7 @@ func (mgr *Manager) Register(name string, fn Perform) {
 // Manager coordinates the processes for the worker.  It is responsible for
 // starting and stopping goroutines to perform work at the desired concurrency level
 type Manager struct {
+	Dispatchers int
 	Concurrency int
 	Pool
 	Logger Logger
@@ -44,10 +45,12 @@ type Manager struct {
 	quiet      bool
 	// The done channel will always block unless
 	// the system is shutting down.
-	done           chan interface{}
-	shutdownWaiter *sync.WaitGroup
-	jobHandlers    map[string]Handler
-	eventHandlers  map[eventType][]func()
+	done              chan interface{}
+	shutdownWaiter    *sync.WaitGroup
+	preDone           chan interface{}
+	preShutdownWaiter *sync.WaitGroup
+	jobHandlers       map[string]Handler
+	eventHandlers     map[eventType][]func()
 
 	// This only needs to be computed once. Store it here to keep things fast.
 	weightedPriorityQueuesEnabled bool
@@ -72,6 +75,11 @@ func (mgr *Manager) Quiet() {
 // Blocks on the shutdownWaiter until all components have finished.
 func (mgr *Manager) Terminate() {
 	mgr.Logger.Info("Shutting down...")
+	// Stop accepting jobs, and begin draining out work-in-progress
+	close(mgr.preDone)
+	mgr.preShutdownWaiter.Wait()
+
+	// Begin shutdown in earnest
 	close(mgr.done)
 	mgr.fireEvent(Shutdown)
 	mgr.shutdownWaiter.Wait()
@@ -88,13 +96,16 @@ func (mgr *Manager) Use(middleware ...MiddlewareFunc) {
 // NewManager returns a new manager with default values.
 func NewManager() *Manager {
 	return &Manager{
+		Dispatchers: 10,
 		Concurrency: 20,
 		Logger:      NewStdLogger(),
 
-		queues:         []string{"default"},
-		done:           make(chan interface{}),
-		shutdownWaiter: &sync.WaitGroup{},
-		jobHandlers:    map[string]Handler{},
+		queues:            []string{"default"},
+		done:              make(chan interface{}),
+		shutdownWaiter:    &sync.WaitGroup{},
+		preDone:           make(chan interface{}),
+		preShutdownWaiter: &sync.WaitGroup{},
+		jobHandlers:       map[string]Handler{},
 		eventHandlers: map[eventType][]func(){
 			Startup:  []func(){},
 			Quiet:    []func(){},

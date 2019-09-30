@@ -1,18 +1,16 @@
 package main
 
 import (
-	"fmt"
-	"log"
 	"time"
 
+	worker "github.com/ValiMail/faktory_worker_go"
 	faktory "github.com/contribsys/faktory/client"
-	worker "github.com/contribsys/faktory_worker_go"
 )
 
 func someFunc(ctx worker.Context, args ...interface{}) error {
-	log.Printf("Working on job %s\n", ctx.Jid())
-	log.Printf("Context %v\n", ctx)
-	log.Printf("Args %v\n", args)
+	// log.Printf("Working on job %s\n", ctx.Jid())
+	// log.Printf("Context %v\n", ctx)
+	// log.Printf("Args %v\n", args)
 	time.Sleep(1 * time.Second)
 	return nil
 }
@@ -21,9 +19,9 @@ func main() {
 	mgr := worker.NewManager()
 	mgr.Use(func(perform worker.Handler) worker.Handler {
 		return func(ctx worker.Context, job *faktory.Job) error {
-			log.Printf("Starting work on job %s of type %s with custom %v\n", ctx.Jid(), ctx.JobType(), job.Custom)
+			// log.Printf("Starting work on job %s of type %s with custom %v\n", ctx.Jid(), ctx.JobType(), job.Custom)
 			err := perform(ctx, job)
-			log.Printf("Finished work on job %s with error %v\n", ctx.Jid(), err)
+			// log.Printf("Finished work on job %s with error %v\n", ctx.Jid(), err)
 			return err
 		}
 	})
@@ -72,5 +70,5 @@ func produce() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(cl.Info())
+	// fmt.Println(cl.Info())
 }

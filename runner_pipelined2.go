@@ -20,7 +20,7 @@ func (mgr *Manager) RunPipelined2() {
 	if mgr.Pool == nil {
 		// Configure max connection pool size to number of fetchers + number of result-reporters + 1 for
 		// the heartbeat process
-		pool, err := NewChannelPool(0, mgr.Dispatchers+mgr.Concurrency+1, func() (Closeable, error) { return faktory.Open() })
+		pool, err := NewChannelPool(mgr.Dispatchers+mgr.Concurrency+1, mgr.Dispatchers+mgr.Concurrency+1, func() (Closeable, error) { return faktory.Open() })
 		if err != nil {
 			panic(err)
 		}

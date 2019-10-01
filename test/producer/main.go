@@ -10,7 +10,7 @@ import (
 
 func main() {
 	numJobs := 1000000
-	numProducers := 10
+	numProducers := 1024
 
 	fmt.Printf("Producing %d jobs, spread across %d producers\n", numJobs, numProducers)
 

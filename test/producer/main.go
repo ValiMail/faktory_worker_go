@@ -18,6 +18,7 @@ func main() {
 	var wg sync.WaitGroup
 	for i := 0; i < numProducers; i++ {
 		wg.Add(1)
+		i := i
 		go func() {
 			defer wg.Done()
 
@@ -26,12 +27,13 @@ func main() {
 				panic(err)
 			}
 
+			fmt.Printf("Beginning production from worker %d.\n", i)
 			for i := 0; i < (numJobs / numProducers); i++ {
 				produce(client)
 			}
 		}()
 	}
-
+	fmt.Println("Workers spawning loop completed.")
 	wg.Wait()
 
 	end := time.Now().UTC()

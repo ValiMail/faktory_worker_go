@@ -17,7 +17,7 @@ stats:
 
 producer:
 	FAKTORY_URL=${FAKTORY_URL} go run -race test/producer/main.go
-	curl http://${FAKTORY_HOST}:7420/stats 2>/dev/null | \
+	@curl http://${FAKTORY_HOST}:7420/stats 2>/dev/null | \
 		jq -c '[.faktory.total_enqueued, .faktory.total_processed, .faktory.total_failures]' 2>/dev/null
 	say Done
 

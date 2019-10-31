@@ -125,7 +125,7 @@ func (mgr *Manager) Run() {
 	faktory.RandomProcessWid = strconv.FormatInt(rand.Int63(), 32)
 
 	if mgr.Pool == nil {
-		pool, err := NewChannelPool(mgr.Concurrency+1, mgr.Concurrency+1, func() (Closeable, error) { return faktory.Open() })
+		pool, err := NewChannelPool(0, mgr.Concurrency+1, func() (Closeable, error) { return faktory.Open() })
 		if err != nil {
 			panic(err)
 		}
